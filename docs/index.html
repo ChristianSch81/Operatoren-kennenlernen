@@ -749,15 +749,27 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
       <div>
         <span class="viz-badge">Interaktive Lernpakete</span>
         <h1 id="startTitle">Operatoren verstehen und sicher anwenden</h1>
-        <p>Wähle das Lernpaket, das zu deiner Klassenstufe passt.</p>
+        <p>Wähle das Lernpaket, das zu deiner Phase passt.</p>
       </div>
+    </section>
+
+    <section class="card start-intro-visual" aria-labelledby="cartoonTitle">
+      <div class="start-intro-copy">
+        <span class="viz-badge">Einfach erklärt</span>
+        <h2 id="cartoonTitle">Operatoren auf einen Blick</h2>
+        <p>Operatoren zeigen dir genau, was du bei einer Aufgabe tun sollst. Die Karikatur gibt dir einen ersten Überblick über wichtige Signalwörter.</p>
+      </div>
+      <figure class="start-cartoon">
+        <img src="phase-5-7/assets/karikatur.webp" alt="Karikatur: Lernende entdecken die Bedeutung der Operatoren benennen, beschreiben, erklären, begründen, zusammenfassen und vergleichen" loading="eager">
+        <figcaption class="text-small text-muted">Vom Fragezeichen zur klaren Arbeitsanweisung.</figcaption>
+      </figure>
     </section>
 
     <section class="start-grid" aria-label="Lernpakete auswählen">
       <article class="card start-package start-package-young">
         <div class="package-icon" aria-hidden="true">🧭</div>
         <div>
-          <span class="grade-badge">Klassenstufen 5–7</span>
+          <span class="grade-badge">Phase 5–7</span>
           <h2>Operatoren-Expedition</h2>
           <p>Entdecke Operatoren mit Bildkarten, verständlichen Erklärungen und kindgerechten Übungen. Für gute Ergebnisse sammelst du Lernsterne.</p>
         </div>
@@ -767,7 +779,7 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
       <article class="card start-package start-package-advanced">
         <div class="package-icon package-icon-op" aria-hidden="true">OP</div>
         <div>
-          <span class="grade-badge">Klassenstufen 8–10</span>
+          <span class="grade-badge">Phase 8–10</span>
           <h2>Operatoren-Training</h2>
           <p>Trainiere zentrale Operatoren in steigenden Anforderungsstufen, formuliere eigene Antworten und überprüfe dein Wissen im Abschlusstest.</p>
         </div>
@@ -788,6 +800,12 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
   #operatorenStart .start-hero h1 { margin:.35rem 0; }
   #operatorenStart .start-hero p { margin:0; color:var(--muted-foreground); }
   #operatorenStart .start-symbol { display:grid; place-items:center; width:4.7rem; height:4.7rem; flex:0 0 auto; border-radius:50%; background:var(--brand); color:var(--primary-foreground); font-size:1.6rem; font-weight:500; }
+  #operatorenStart .start-intro-visual { display:grid; grid-template-columns:minmax(12rem,.65fr) minmax(0,1.65fr); align-items:center; gap:1.25rem; max-width:58rem; margin:0 auto 1.25rem; }
+  #operatorenStart .start-intro-copy h2 { margin:.5rem 0; }
+  #operatorenStart .start-intro-copy p { margin:0; }
+  #operatorenStart .start-cartoon { margin:0; }
+  #operatorenStart .start-cartoon img { display:block; width:100%; height:auto; border-radius:.9rem; border:1px solid var(--border); }
+  #operatorenStart .start-cartoon figcaption { margin-top:.45rem; text-align:center; }
   #operatorenStart .start-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; max-width:58rem; margin:0 auto; }
   #operatorenStart .start-package { display:grid; grid-template-rows:auto 1fr auto; gap:1rem; overflow:hidden; }
   #operatorenStart .start-package-young { background:linear-gradient(145deg,var(--card),color-mix(in srgb,var(--viz-series-1) 10%,var(--background))); }
@@ -800,7 +818,7 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
   #operatorenStart .package-icon { display:grid; place-items:center; width:3.3rem; height:3.3rem; border-radius:50%; background:color-mix(in srgb,var(--viz-series-1) 14%,var(--background)); font-size:1.8rem; }
   #operatorenStart .package-icon-op { background:var(--brand); color:var(--primary-foreground); font-size:1rem; }
   #operatorenStart footer { max-width:58rem; margin:1.5rem auto 0; padding-top:.85rem; border-top:1px solid var(--border); text-align:center; color:var(--muted-foreground); }
-  @media (max-width:680px) { #operatorenStart .start-grid { grid-template-columns:1fr; } #operatorenStart .start-hero { align-items:flex-start; } }
+  @media (max-width:680px) { #operatorenStart .start-grid, #operatorenStart .start-intro-visual { grid-template-columns:1fr; } #operatorenStart .start-hero { align-items:flex-start; } }
   @media (max-width:420px) { #operatorenStart .start-hero { flex-direction:column; } }
 </style>
 

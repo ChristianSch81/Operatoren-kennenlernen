@@ -765,7 +765,7 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
 
   <header class="hero810">
     <div>
-      <span class="viz-badge">Klassenstufen 8–10</span>
+      <span class="viz-badge">Phase 8–10</span>
       <h1>Operatoren-Training</h1>
       <p>Trainiere jeden Operator in sechs Stufen: Grundlagen, AFB II und eigene Formulierungen.</p>
     </div>
@@ -803,7 +803,7 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
     </div>
     <div class="reference-grid810">
       <figure>
-        <img src="assets/uebersicht-operatoren-8-10.webp" alt="Übersicht der wichtigsten Operatoren für die Klassenstufen 8 bis 10" loading="eager">
+        <img src="assets/uebersicht-operatoren-8-10.webp" alt="Übersicht der wichtigsten Operatoren für die Phasen 8 bis 10" loading="eager">
         <figcaption><b>Die wichtigsten Operatoren</b><span>Bedeutung und Vorgehensweise bildhaft erklärt</span></figcaption>
       </figure>
       <figure>
@@ -1031,7 +1031,7 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
     eroertern:[
       {type:'choice', title:'AFB II 1: Argumente abwägen', prompt:'Welche Antwort zeigt eine echte Abwägung?', answer:'Digitale Schulbücher sparen Gewicht und Papier, können aber bei schlechter Ausstattung zu technischen Problemen führen.', options:['Digitale Schulbücher sind modern.','Digitale Schulbücher sparen Gewicht und Papier, können aber bei schlechter Ausstattung zu technischen Problemen führen.','Viele Schulen nutzen Bücher.'], why:'Die Antwort berücksichtigt zwei Seiten und bereitet ein Urteil vor.'},
       {type:'multi', title:'AFB II 2: Erörterung vorbereiten', prompt:'Welche Schritte gehören zur AFB-II-Vorbereitung einer Erörterung?', answers:['Argumente sammeln','Argumente gewichten','Bedingungen für ein Urteil prüfen'], options:['Argumente sammeln','Argumente gewichten','nur eine Seite betrachten','Bedingungen für ein Urteil prüfen'], why:'Erörtern heißt, Argumente zu prüfen und zu gewichten.'},
-      {type:'write', title:'AFB II 3: Abwägung ausformulieren', prompt:'Erörtere kurz, ob Klassenarbeiten durch Projekte ersetzt werden sollten.', min:190, criteria:['Pro und Contra nennen','Argumente gewichten','Urteil begründen'], model:'Projekte können Klassenarbeiten teilweise ersetzen, weil sie selbstständiges Arbeiten und Anwendung von Wissen zeigen. Außerdem ermöglichen sie kreative Lösungen und Teamarbeit. Gegen einen vollständigen Ersatz spricht, dass Einzelleistungen manchmal schwerer vergleichbar sind. Daher sollten Projekte Klassenarbeiten ergänzen, aber nicht vollständig ersetzen.'}
+      {type:'write', title:'AFB II 3: Abwägung ausformulieren', prompt:'Erörtere kurz, ob Gelingensnachweise durch Projekte ersetzt werden sollten.', min:190, criteria:['Pro und Contra nennen','Argumente gewichten','Urteil begründen'], model:'Projekte können Gelingensnachweise teilweise ersetzen, weil sie selbstständiges Arbeiten und Anwendung von Wissen zeigen. Außerdem ermöglichen sie kreative Lösungen und Teamarbeit. Gegen einen vollständigen Ersatz spricht, dass Einzelleistungen manchmal schwerer vergleichbar sind. Daher sollten Projekte Gelingensnachweise ergänzen, aber nicht vollständig ersetzen.'}
     ]
   };
   operators.forEach(op => { op.levels = op.levels.concat(afb2Tasks[op.id] || []); });
