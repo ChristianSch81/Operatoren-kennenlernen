@@ -1,0 +1,1208 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operatoren - Phase 8-10</title>
+<style>
+:root {
+  color-scheme: light dark;
+  background-color: var(--background) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: light-dark(rgb(255 255 255), rgb(24 24 24));
+  --foreground: light-dark(rgb(26 28 31), rgb(255 255 255));
+  --card: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --card-foreground: var(--foreground);
+  --popover: light-dark(rgb(255 255 255), rgb(45 45 45));
+  --popover-foreground: var(--foreground);
+  --primary: light-dark(rgb(51 156 255), rgb(131 195 255));
+  --primary-foreground: light-dark(rgb(255 255 255), rgb(13 13 13));
+  --secondary: light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%));
+  --secondary-foreground: var(--foreground);
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: light-dark(
+    rgb(26 28 31 / 49.4%),
+    rgb(255 255 255 / 49.8%)
+  );
+  --accent: light-dark(rgb(229 242 255), rgb(13 39 63));
+  --accent-foreground: var(--primary);
+  --destructive: light-dark(rgb(226 85 7), rgb(255 133 73));
+  --border: light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%));
+  --input: light-dark(
+    rgb(26 28 31 / 11.8%),
+    color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+  );
+  --ring: light-dark(rgb(51 156 255), rgb(131 195 255 / 76%));
+  --font-size-base: 14px;
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans: -apple-system, system-ui, "Segoe UI", sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 430;
+  --font-weight-medium: 500;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --radius: 12.5px;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 17'%3E%3Cpath d='M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z'/%3E%3C/svg%3E");
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+  --color-background-primary: var(--background);
+  --color-text-primary: var(--foreground);
+  --color-border-secondary: var(--border);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html > body {
+  margin: 0;
+  padding: 5px;
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-normal);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: pointer;
+  font-weight: var(--viz-font-weight-medium);
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+}
+
+b,
+strong,
+th {
+  font-weight: var(--font-weight-medium);
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: superellipse(1.5);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: superellipse(1.5);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+#widget > :not(.card) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--popover-foreground);
+  background: var(--popover);
+  box-shadow: none;
+  font-size: var(--font-size-tooltip);
+  line-height: var(--line-height-tooltip);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.viz-badge {
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  color: var(--accent-foreground);
+  background: var(--accent);
+  font-weight: var(--font-weight-medium);
+}
+
+small,
+.text-small,
+.viz-badge {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls > .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls > .form-label > :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+.btn {
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.btn-primary {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: padding-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: padding-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--foreground);
+  background: var(--secondary);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type="file"] {
+  padding: 0;
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control[type="file"]::file-selector-button {
+  min-height: 26px;
+  margin-right: 8px;
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+}
+
+.form-control[type="file"]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type="color"] {
+  width: 40px;
+  height: 28px;
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: superellipse(1.5);
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: 72px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  padding: 0 32px 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
+    linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 10px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-select:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-check {
+  display: flex;
+  min-height: 20px;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+  border-color: var(--input);
+  border-radius: var(--radius-sm);
+  corner-shape: superellipse(1.5);
+  background-color: var(--secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: "";
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+}
+
+.form-check-input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+}
+
+.form-check-input[type="radio"]:checked {
+  border: 2px solid var(--primary);
+  background:
+    radial-gradient(circle, var(--primary-foreground) 0 2.5px, transparent 3px),
+    var(--primary);
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+  box-shadow: var(--shadow-sm);
+  content: "";
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--primary);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 28px;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: 0;
+  accent-color: var(--primary);
+  background: linear-gradient(
+      color-mix(in srgb, var(--foreground) 7%, transparent),
+      color-mix(in srgb, var(--foreground) 7%, transparent)
+    )
+    center / 100% 2px no-repeat;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-webkit-slider-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range::-moz-range-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+    [aria-pressed="true"],
+    [aria-selected="true"],
+    .is-selected
+  ) {
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.btn.viz-tile:is([aria-pressed="true"], [aria-selected="true"], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget > svg {
+  width: 100%;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--background);}
+</style>
+</head>
+<body>
+<div id="operatoren810" class="op810">
+  <aside class="side-nav810 card" aria-label="Navigation im Lernpaket">
+    <div class="nav-brand810">
+      <span class="nav-mark810" aria-hidden="true">OP</span>
+      <span><small>Lernpaket</small><strong>Operatoren 8–10</strong></span>
+    </div>
+    <a class="btn btn-block home-link810" href="../index.html">← Paketauswahl</a>
+    <nav class="nav-list810" aria-label="Bereiche">
+      <button type="button" class="btn btn-block btn-primary nav-link810" id="navOverview810" data-nav810="start810"><span aria-hidden="true">⌂</span><span><b>Überblick</b><small>Zum Start</small></span></button>
+      <a class="btn btn-block nav-link810" href="#info810" data-nav810="info810"><span aria-hidden="true">i</span><span><b>Grundwissen</b><small>Operatoren verstehen</small></span></a>
+      <a class="btn btn-block nav-link810" href="#bilder810" data-nav810="bilder810"><span aria-hidden="true">▣</span><span><b>Übersichten</b><small>Begriffe und Umfang</small></span></a>
+      <a class="btn btn-block nav-link810" href="#training810" data-nav810="training810"><span aria-hidden="true">✎</span><span><b>Training</b><small>Sechs Operatoren</small></span></a>
+      <a class="btn btn-block nav-link810" href="#test810" data-nav810="test810"><span aria-hidden="true">✓</span><span><b>Wissenstest</b><small>15 Testaufgaben</small></span></a>
+    </nav>
+    <div class="nav-note810"><b>Leistungsziel</b><span>Mindestens 80% im Wissenstest.</span></div>
+  </aside>
+  <div class="topbar810" id="start810" role="banner">
+    <div class="topbar-left810">
+      <strong>Überblick Operatoren 8-10</strong>
+      <span class="subject-label810">Deutsch Sprachwissen M/R/E 8/9/10</span>
+    </div>
+    <div class="topbar-right810" aria-label="Themenbereich Operatoren">
+      <span class="topic-mark810">OP</span>
+      <button type="button" class="btn overview-label810" id="overview810">Überblick</button>
+    </div>
+  </div>
+
+  <header class="hero810">
+    <div>
+      <span class="viz-badge">Klassenstufen 8–10</span>
+      <h1>Operatoren-Training</h1>
+      <p>Trainiere jeden Operator in sechs Stufen: Grundlagen, AFB II und eigene Formulierungen.</p>
+    </div>
+    <div class="score810" id="score810" aria-live="polite">
+      <strong>0/36</strong>
+      <span>Aufgaben</span>
+    </div>
+  </header>
+
+  <section class="intro810 card" id="info810" aria-labelledby="infoTitle810">
+    <div class="intro-copy810">
+      <div class="intro-heading810"><span class="viz-badge">Grundwissen</span><span>Arbeitsaufträge sicher entschlüsseln</span></div>
+      <h2 id="infoTitle810">Was sind Operatoren?</h2>
+      <p>Operatoren sind Arbeitsanweisungen, die festlegen, wie eine Aufgabe bearbeitet werden soll. Sie verdeutlichen, welche Denk- und Schreibleistung erwartet wird. Operatoren wie <b>beschreiben</b>, <b>erklären</b>, <b>analysieren</b>, <b>erläutern</b> oder <b>erörtern</b> verlangen unterschiedlich anspruchsvolle Antworten. Im Deutschunterricht helfen sie beispielsweise dabei, literarische Texte, Sachtexte, Diagramme oder sprachliche Mittel gezielt zu untersuchen. Beim Beschreiben werden erkennbare Merkmale sachlich dargestellt. Eine Analyse untersucht einen Gegenstand genauer und belegt Aussagen am Text. Beim Erörtern werden unterschiedliche Argumente abgewogen, bevor ein begründetes Urteil formuliert wird. Wer die Bedeutung eines Operators kennt, kann seine Antwort passend aufbauen, den erwarteten Umfang einschätzen und Aufgaben präziser bearbeiten.</p>
+    </div>
+    <div class="intro-flow810" aria-label="Vorgehen bei einer Aufgabe">
+      <span><b>1</b><em>Operator erkennen</em></span><span aria-hidden="true">→</span><span><b>2</b><em>Auftrag klären</em></span><span aria-hidden="true">→</span><span><b>3</b><em>Antwort strukturieren</em></span>
+    </div>
+  </section>
+
+  <section class="test-launch810" id="test810" aria-label="Wissenstest">
+    <div>
+      <span class="viz-badge">Abschlusstest</span>
+      <h2>Teste dein Wissen</h2>
+      <p>15 Aufgaben mit steigendem Schwierigkeitsgrad. Ab 80% gilt die Leistung als gut.</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="startTest810">Wissenstest starten</button>
+  </section>
+
+  <section class="reference810" id="bilder810" aria-labelledby="bilderTitle810">
+    <div class="section-title810">
+      <span class="viz-badge">Orientierung</span>
+      <h2 id="bilderTitle810">Operatoren und Antwortumfang im Überblick</h2>
+      <p>Nutze beide Darstellungen als Nachschlagehilfe vor und während des Trainings.</p>
+    </div>
+    <div class="reference-grid810">
+      <figure>
+        <img src="assets/uebersicht-operatoren-8-10.webp" alt="Übersicht der wichtigsten Operatoren für die Klassenstufen 8 bis 10" loading="eager">
+        <figcaption><b>Die wichtigsten Operatoren</b><span>Bedeutung und Vorgehensweise bildhaft erklärt</span></figcaption>
+      </figure>
+      <figure>
+        <img src="assets/operatoren-textlaenge.webp" alt="Übersicht zur erwarteten Textlänge bei Operatoren" loading="lazy">
+        <figcaption><b>Wie ausführlich soll die Antwort sein?</b><span>Orientierung zu Umfang und Schwerpunkt</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="layout810" id="training810">
+    <aside class="operator-menu810" aria-label="Operatoren">
+      <h2>Operator wählen</h2>
+      <div id="operatorNav810" class="operator-list810"></div>
+    </aside>
+
+    <main class="workspace810" id="workspace810" aria-live="polite"></main>
+  </section>
+
+  <footer class="author810">Autor: Christian Schwend</footer>
+</div>
+
+<style>
+  #operatoren810 { --brand:#9d1f2f; --brand-dark:#741622; --soft1:color-mix(in srgb,var(--viz-series-1) 10%,var(--background)); --soft2:color-mix(in srgb,var(--viz-series-2) 11%,var(--background)); --soft3:color-mix(in srgb,var(--viz-series-3) 10%,var(--background)); display:grid; grid-template-columns:14rem minmax(0,1fr); column-gap:1.4rem; color:var(--foreground); }
+  #operatoren810 > :not(.side-nav810) { grid-column:2; }
+  #operatoren810 .side-nav810 { grid-column:1; grid-row:1 / span 20; position:sticky; top:1rem; align-self:start; display:grid; gap:.85rem; }
+  #operatoren810 .nav-brand810 { display:flex; align-items:center; gap:.65rem; padding-bottom:.7rem; border-bottom:1px solid var(--border); }
+  #operatoren810 .nav-brand810 > span:last-child { display:grid; }
+  #operatoren810 .nav-brand810 small, #operatoren810 .nav-link810 small { display:block; color:var(--muted-foreground); }
+  #operatoren810 .nav-brand810 strong { color:var(--brand-dark); }
+  #operatoren810 .nav-mark810 { display:grid; place-items:center; width:2.5rem; height:2.5rem; border-radius:50%; background:var(--brand); color:var(--primary-foreground); }
+  #operatoren810 .nav-list810 { display:grid; gap:.4rem; }
+  #operatoren810 .nav-link810 { justify-content:flex-start; gap:.65rem; text-align:left; white-space:normal; }
+  #operatoren810 .nav-link810 > span:first-child { display:grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:50%; background:var(--soft1); }
+  #operatoren810 .nav-link810 > span:last-child { display:grid; gap:.05rem; }
+  #operatoren810 .nav-link810.btn-primary small { color:var(--primary-foreground); opacity:.82; }
+  #operatoren810 .nav-note810 { display:grid; gap:.2rem; padding:.7rem; border-left:3px solid var(--brand); background:color-mix(in srgb,var(--brand) 6%,var(--background)); }
+  #operatoren810 .nav-note810 span { color:var(--muted-foreground); }
+  #operatoren810 .topbar810 { display:flex; justify-content:space-between; align-items:center; gap:.8rem; margin-bottom:1rem; padding:.55rem .7rem; background:color-mix(in srgb,var(--brand) 5%,var(--background)); border-bottom:1px solid color-mix(in srgb,var(--brand) 20%,var(--border)); }
+  #operatoren810 .topbar-left810, #operatoren810 .topbar-right810 { display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; }
+  #operatoren810 .topbar-left810 strong { color:var(--brand); }
+  #operatoren810 .subject-label810, #operatoren810 .overview-label810 { display:inline-flex; align-items:center; min-height:2rem; padding:.3rem .65rem; background:var(--card); color:var(--card-foreground); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 2px 8px color-mix(in srgb,var(--foreground) 8%,transparent); }
+  #operatoren810 .subject-label810 { color:var(--brand-dark); font-weight:500; }
+  #operatoren810 .topic-mark810 { display:grid; place-items:center; width:2rem; height:2rem; border-radius:50%; background:var(--brand); color:#fff; font-weight:500; }
+  #operatoren810 .hero810 { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.1rem; }
+  #operatoren810 .hero810 h1 { margin:.25rem 0; }
+  #operatoren810 .hero810 p { margin:0; color:var(--muted-foreground); }
+  #operatoren810 .intro810 { position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(13rem,.4fr); gap:1.2rem; align-items:center; margin-bottom:1.1rem; overflow:hidden; background:linear-gradient(135deg,var(--card),color-mix(in srgb,var(--brand) 7%,var(--background))); }
+  #operatoren810 .intro810::before { content:''; position:absolute; inset:0 auto 0 0; width:.35rem; background:var(--brand); }
+  #operatoren810 .intro-copy810 { padding-left:.35rem; }
+  #operatoren810 .intro-heading810 { display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; color:var(--muted-foreground); }
+  #operatoren810 .intro810 h2 { margin:.35rem 0 .55rem; }
+  #operatoren810 .intro810 p { margin:0; }
+  #operatoren810 .intro-flow810 { display:grid; gap:.45rem; text-align:left; }
+  #operatoren810 .intro-flow810 > span:not([aria-hidden]) { display:flex; align-items:center; gap:.55rem; padding:.65rem; background:color-mix(in srgb,var(--background) 80%,transparent); border:1px solid var(--border); border-radius:var(--radius); }
+  #operatoren810 .intro-flow810 b { display:grid; place-items:center; width:1.65rem; height:1.65rem; border-radius:50%; background:var(--brand); color:var(--primary-foreground); }
+  #operatoren810 .intro-flow810 em { font-style:normal; }
+  #operatoren810 .intro-flow810 > span[aria-hidden] { justify-self:center; color:var(--muted-foreground); }
+  #operatoren810 .score810 { display:grid; place-items:center; width:5.2rem; height:5.2rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--soft1); text-align:center; flex:0 0 auto; }
+  #operatoren810 .score810 strong, #operatoren810 .score810 span { display:block; }
+  #operatoren810 .score810 span { color:var(--muted-foreground); }
+  #operatoren810 .test-launch810 { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin:0 0 1rem; padding:1rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--soft3); }
+  #operatoren810 .test-launch810 h2 { margin:.25rem 0 .35rem; }
+  #operatoren810 .test-launch810 p { margin:0; color:var(--muted-foreground); }
+  #operatoren810 .reference810 { margin:0 0 1.4rem; padding:1rem 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  #operatoren810 .section-title810 { margin-bottom:.9rem; }
+  #operatoren810 .section-title810 h2 { margin:.3rem 0; }
+  #operatoren810 .section-title810 p { margin:0; color:var(--muted-foreground); }
+  #operatoren810 .reference-grid810 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+  #operatoren810 img { display:block; width:100%; object-fit:contain; }
+  #operatoren810 .reference-grid810 figure { margin:0; display:grid; align-content:start; overflow:hidden; border:1px solid var(--border); border-radius:calc(var(--radius) * 1.2); background:var(--card); }
+  #operatoren810 .reference-grid810 img { height:34rem; background:var(--background); }
+  #operatoren810 .reference-grid810 figcaption { display:grid; gap:.2rem; padding:.75rem; border-top:1px solid var(--border); }
+  #operatoren810 .reference-grid810 figcaption span { color:var(--muted-foreground); }
+  #operatoren810 .layout810 { display:grid; grid-template-columns:minmax(13rem,.34fr) minmax(0,1fr); gap:1rem; align-items:start; }
+  #operatoren810 .operator-menu810 { position:sticky; top:1rem; }
+  #operatoren810 .operator-menu810 h2 { margin:0 0 .65rem; }
+  #operatoren810 .operator-list810 { display:grid; gap:.45rem; }
+  #operatoren810 .operator-list810 .btn { justify-content:space-between; gap:.5rem; text-align:left; white-space:normal; }
+  #operatoren810 .operator-count810 { color:var(--muted-foreground); white-space:nowrap; }
+  #operatoren810 .workspace810 { min-width:0; }
+  #operatoren810 .operator-head810 { display:grid; grid-template-columns:minmax(0,1fr) minmax(11rem,.45fr); gap:1rem; align-items:start; margin-bottom:1rem; }
+  #operatoren810 .operator-title810 { padding:1rem; background:var(--soft1); border-radius:var(--radius); }
+  #operatoren810 .operator-title810 h2 { margin:.3rem 0 .45rem; }
+  #operatoren810 .operator-title810 p { margin:.35rem 0; }
+  #operatoren810 .operator-image810 img { max-height:28rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--card); }
+  #operatoren810 .task-tabs810 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; margin:1rem 0; }
+  #operatoren810 .task-tabs810 .btn { white-space:normal; min-height:3.1rem; }
+  #operatoren810 .task-panel810 { padding:1rem; border:1px solid var(--border); border-radius:var(--radius); background:color-mix(in srgb,var(--card) 45%,transparent); }
+  #operatoren810 .task-panel810 h3 { margin:.25rem 0 .65rem; }
+  #operatoren810 .prompt810 { padding:.9rem; background:var(--soft2); border-left:4px solid var(--viz-series-2); border-radius:var(--radius); margin:.75rem 0; }
+  #operatoren810 .answer-grid810 { display:grid; gap:.55rem; margin:.75rem 0; }
+  #operatoren810 .answer-grid810 .btn { justify-content:flex-start; text-align:left; white-space:normal; }
+  #operatoren810 .choice-list810 { display:grid; gap:.55rem; margin:.75rem 0; }
+  #operatoren810 .form-check { align-items:flex-start; }
+  #operatoren810 textarea.form-control { min-height:9rem; resize:vertical; }
+  #operatoren810 .feedback810 { min-height:3rem; margin:.8rem 0; padding:.8rem; background:var(--muted); border-left:4px solid var(--border); border-radius:var(--radius); }
+  #operatoren810 .feedback810.good { background:var(--soft3); border-left-color:var(--viz-series-3); }
+  #operatoren810 .feedback810.try { background:var(--soft2); border-left-color:var(--viz-series-2); }
+  #operatoren810 .writer810 { display:grid; gap:.7rem; }
+  #operatoren810 .criteria810 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.45rem; }
+  #operatoren810 .criteria810 span { padding:.55rem; background:var(--soft1); border-radius:var(--radius); }
+  #operatoren810 .model810 { margin-top:.75rem; padding:.8rem; background:var(--soft3); border-radius:var(--radius); }
+  #operatoren810 .actions810 { display:flex; justify-content:space-between; align-items:center; gap:.75rem; flex-wrap:wrap; margin-top:.9rem; }
+  #operatoren810 .test-head810 { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1rem; }
+  #operatoren810 .test-meter810 { height:.8rem; background:var(--muted); border-radius:999px; overflow:hidden; margin:.7rem 0; }
+  #operatoren810 .test-meter810 span { display:block; height:100%; width:0; background:var(--primary); }
+  #operatoren810 .result810 { padding:1rem; border-radius:var(--radius); background:var(--soft1); }
+  #operatoren810 .result810.good { background:var(--soft3); }
+  #operatoren810 .result810.practice { background:var(--soft2); }
+  #operatoren810 .author810 { margin-top:1.25rem; padding-top:.75rem; border-top:1px solid var(--border); color:var(--muted-foreground); text-align:center; }
+  @media (max-width:980px){ #operatoren810 { grid-template-columns:1fr; } #operatoren810 > :not(.side-nav810), #operatoren810 .side-nav810 { grid-column:1; } #operatoren810 .side-nav810 { grid-row:auto; position:static; margin-bottom:1rem; } #operatoren810 .nav-brand810 { border-bottom:0; } #operatoren810 .nav-list810 { grid-template-columns:repeat(3,minmax(0,1fr)); } #operatoren810 .nav-note810 { display:none; } }
+  @media (max-width:760px){ #operatoren810 .layout810,#operatoren810 .intro810{grid-template-columns:1fr} #operatoren810 .intro-flow810{grid-template-columns:1fr auto 1fr auto 1fr;align-items:center} #operatoren810 .operator-menu810{position:static} #operatoren810 .operator-list810{grid-template-columns:repeat(2,minmax(0,1fr))} #operatoren810 .operator-head810{grid-template-columns:1fr} #operatoren810 .reference-grid810{grid-template-columns:1fr} #operatoren810 .reference-grid810 img{height:auto;max-height:38rem} }
+  @media (max-width:560px){ #operatoren810 .nav-list810{grid-template-columns:repeat(2,minmax(0,1fr))} #operatoren810 .topbar-right810{display:none} #operatoren810 .hero810,#operatoren810 .test-launch810,#operatoren810 .test-head810{align-items:flex-start} #operatoren810 .test-launch810{flex-direction:column} #operatoren810 .task-tabs810,#operatoren810 .criteria810{grid-template-columns:1fr} }
+  @media (max-width:420px){ #operatoren810 .operator-list810,#operatoren810 .intro-flow810{grid-template-columns:1fr} #operatoren810 .score810{width:4.6rem;height:4.6rem} }
+</style>
+
+<script>
+(() => {
+  const root = document.getElementById('operatoren810');
+  const nav = root.querySelector('#operatorNav810');
+  const work = root.querySelector('#workspace810');
+  const score = root.querySelector('#score810');
+  const testButton = root.querySelector('#startTest810');
+  const key = 'operatoren-phase-8-10-training-v2';
+  const operators = [
+    {
+      id:'beschreiben',
+      title:'Beschreiben',
+      image:'assets/beschreiben.webp',
+      definition:'Merkmale eines Sachverhalts genau, sachlich und geordnet wiedergeben.',
+      question:'Was ist erkennbar?',
+      levels:[
+        {type:'choice', title:'Stufe 1: Operator erkennen', prompt:'Welche Antwort passt am besten zu „Beschreibe die Bevölkerungsentwicklung im Diagramm“?', answer:'Die Bevölkerung steigt zunächst langsam und ab 2000 deutlich stärker an.', options:['Die Bevölkerung steigt zunächst langsam und ab 2000 deutlich stärker an.','Die Bevölkerung steigt, weil die medizinische Versorgung besser wurde.','Ich finde die Entwicklung problematisch.'], why:'Die passende Antwort beschreibt erkennbare Merkmale, ohne Ursachen oder Bewertungen einzubauen.'},
+        {type:'multi', title:'Stufe 2: Beobachtungen auswählen', prompt:'Welche Bausteine gehören in eine sachliche Beschreibung?', answers:['Zeitraum und Thema nennen','Auffällige Werte oder Wendepunkte benennen','Entwicklung geordnet wiedergeben'], options:['Zeitraum und Thema nennen','Auffällige Werte oder Wendepunkte benennen','Eine persönliche Meinung formulieren','Entwicklung geordnet wiedergeben'], why:'Eine Beschreibung bleibt beim Beobachtbaren und ordnet die Informationen sinnvoll.'},
+        {type:'write', title:'Stufe 3: Sätze schreiben', prompt:'Formuliere drei bis vier Sätze zu einem Diagramm über steigende Mediennutzung von 2015 bis 2025.', min:120, criteria:['sachlich bleiben','Zeitraum nennen','Entwicklung geordnet darstellen'], model:'Das Diagramm zeigt die Mediennutzung von Jugendlichen zwischen 2015 und 2025. Insgesamt nimmt die Nutzung deutlich zu. Besonders stark steigt sie nach 2020. Auffällig ist, dass der höchste Wert am Ende des dargestellten Zeitraums liegt.'}
+      ]
+    },
+    {
+      id:'erklaeren',
+      title:'Erklären',
+      image:'assets/erklaeren.webp',
+      definition:'Ursachen, Wirkungen und Zusammenhänge nachvollziehbar machen.',
+      question:'Warum ist das so?',
+      levels:[
+        {type:'choice', title:'Stufe 1: Zusammenhang erkennen', prompt:'Welche Antwort erklärt einen Zusammenhang?', answer:'Wolken entstehen, wenn feuchte Luft abkühlt und Wasserdampf kondensiert.', options:['Auf dem Bild sind Wolken zu sehen.','Wolken entstehen, wenn feuchte Luft abkühlt und Wasserdampf kondensiert.','Wolken finde ich interessant.'], why:'Eine Erklärung zeigt, wie Ursache und Wirkung zusammenhängen.'},
+        {type:'multi', title:'Stufe 2: Erklärung bauen', prompt:'Welche Elemente braucht eine gute Erklärung zum Treibhauseffekt?', answers:['Ursache benennen','Wirkung beschreiben','Zusammenhang mit Signalwörtern verdeutlichen'], options:['Ursache benennen','Nur eine Meinung nennen','Wirkung beschreiben','Zusammenhang mit Signalwörtern verdeutlichen'], why:'Erklärungen verbinden Ursache, Wirkung und Zusammenhang klar miteinander.'},
+        {type:'write', title:'Stufe 3: Sätze schreiben', prompt:'Erkläre in drei bis fünf Sätzen, warum Plastikmüll im Meer ein Problem ist.', min:140, criteria:['Ursache nennen','Wirkung erklären','Zusammenhang sprachlich verbinden'], model:'Plastikmüll gelangt häufig über Flüsse oder Strände ins Meer. Dort zerfällt er nur sehr langsam und kann von Tieren mit Nahrung verwechselt werden. Dadurch können Tiere verletzt werden oder sterben. Außerdem entsteht Mikroplastik, das in Nahrungsketten gelangen kann.'}
+      ]
+    },
+    {
+      id:'begruenden',
+      title:'Begründen',
+      image:'assets/begruenden.webp',
+      definition:'Eine Aussage oder Entscheidung mit schlüssigen Argumenten stützen.',
+      question:'Warum vertrete ich diese Aussage?',
+      levels:[
+        {type:'choice', title:'Stufe 1: Grund erkennen', prompt:'Welche Antwort begründet die Aussage „Ein Tempolimit ist sinnvoll“?', answer:'Ein Tempolimit ist sinnvoll, weil geringere Geschwindigkeiten den CO2-Ausstoß senken können.', options:['Ein Tempolimit ist sinnvoll, weil geringere Geschwindigkeiten den CO2-Ausstoß senken können.','Auf Autobahnen fahren viele Autos.','Ein Tempolimit gibt es in manchen Ländern.'], why:'Eine Begründung stützt eine Aussage durch einen passenden Grund.'},
+        {type:'multi', title:'Stufe 2: Argumente prüfen', prompt:'Welche Bausteine stärken eine Begründung?', answers:['klare These','passender Grund','Beleg oder Beispiel'], options:['klare These','passender Grund','reine Wiederholung der Aufgabe','Beleg oder Beispiel'], why:'Eine tragfähige Begründung verbindet These, Grund und Stützung.'},
+        {type:'write', title:'Stufe 3: Sätze schreiben', prompt:'Begründe in drei bis vier Sätzen, warum Hausaufgaben sinnvoll oder nicht sinnvoll sein können.', min:130, criteria:['Position deutlich machen','mindestens einen Grund nennen','Grund erläutern oder belegen'], model:'Hausaufgaben können sinnvoll sein, weil sie helfen, Unterrichtsinhalte selbstständig zu üben. Wenn Aufgaben gut ausgewählt sind, erkennen Lernende, was sie bereits verstanden haben. Zu viele Hausaufgaben können jedoch überfordern. Deshalb sollten sie klar begrenzt und passend zum Unterricht sein.'}
+      ]
+    },
+    {
+      id:'erlaeutern',
+      title:'Erläutern',
+      image:'assets/erlaeutern.webp',
+      definition:'Einen Sachverhalt erklären und mit Beispiel, Material oder Beleg verdeutlichen.',
+      question:'Woran lässt sich das zeigen?',
+      levels:[
+        {type:'choice', title:'Stufe 1: Materialbezug erkennen', prompt:'Welche Antwort erläutert die Wirkung von Werbung?', answer:'Werbung beeinflusst Kaufentscheidungen, indem sie auffällige Bilder nutzt; die Sneaker-Anzeige zeigt das durch starke Farben und einen Slogan.', options:['Werbung ist überall.','Werbung beeinflusst Kaufentscheidungen, indem sie auffällige Bilder nutzt; die Sneaker-Anzeige zeigt das durch starke Farben und einen Slogan.','Ich mag die Anzeige nicht.'], why:'Erläutern verbindet Erklärung und konkretes Material oder Beispiel.'},
+        {type:'multi', title:'Stufe 2: Beispiele auswählen', prompt:'Welche Bausteine passen zum Operator „erläutern“?', answers:['Sachverhalt erklären','Beispiel oder Materialbezug nutzen','Zusammenhang verdeutlichen'], options:['Sachverhalt erklären','Beispiel oder Materialbezug nutzen','nur Stichwörter aufzählen','Zusammenhang verdeutlichen'], why:'Beim Erläutern wird eine Erklärung anschaulich gemacht.'},
+        {type:'write', title:'Stufe 3: Sätze schreiben', prompt:'Erläutere in vier Sätzen, wie Influencer Kaufentscheidungen beeinflussen können. Nutze ein Beispiel.', min:150, criteria:['Sachverhalt erklären','konkretes Beispiel einbauen','Wirkung verdeutlichen'], model:'Influencer können Kaufentscheidungen beeinflussen, weil ihre Empfehlungen persönlich und glaubwürdig wirken. Wenn eine bekannte Person einen Sneaker im Alltag zeigt, entsteht der Eindruck, dass das Produkt beliebt und nützlich ist. Besonders Jugendliche orientieren sich teilweise an solchen Vorbildern. Dadurch kann die Bereitschaft steigen, ein Produkt selbst zu kaufen.'}
+      ]
+    },
+    {
+      id:'darlegen',
+      title:'Darlegen',
+      image:'assets/darlegen.webp',
+      definition:'Einen Sachverhalt oder Standpunkt klar, geordnet und logisch ausführen.',
+      question:'Wie ist der Gedankengang aufgebaut?',
+      levels:[
+        {type:'choice', title:'Stufe 1: Struktur erkennen', prompt:'Welche Antwort legt Ursachen des Klimawandels dar?', answer:'Zunächst entstehen Treibhausgase durch Industrie und Verkehr; anschließend wird gezeigt, wie sie die Erwärmung verstärken.', options:['Klimawandel ist schlecht.','Zunächst entstehen Treibhausgase durch Industrie und Verkehr; anschließend wird gezeigt, wie sie die Erwärmung verstärken.','Das Klima verändert sich.'], why:'Darlegen verlangt einen geordneten Gedankengang.'},
+        {type:'multi', title:'Stufe 2: Aufbau sichern', prompt:'Welche Elemente gehören zu einer gelungenen Darlegung?', answers:['sinnvolle Reihenfolge','Fachbegriffe nutzen','Zusammenhänge logisch verbinden'], options:['sinnvolle Reihenfolge','Fachbegriffe nutzen','ungeordnete Stichwortliste','Zusammenhänge logisch verbinden'], why:'Eine Darlegung ist strukturiert, fachlich und nachvollziehbar.'},
+        {type:'write', title:'Stufe 3: Sätze schreiben', prompt:'Lege in vier bis fünf Sätzen dar, warum nachhaltiger Konsum mehrere Bereiche betrifft.', min:160, criteria:['geordnet aufbauen','Fachbegriffe verwenden','Schlussfolgerung formulieren'], model:'Nachhaltiger Konsum betrifft zuerst die Auswahl von Produkten, weil Rohstoffe und Herstellungsbedingungen eine Rolle spielen. Außerdem ist der Transport wichtig, da lange Lieferwege zusätzliche Emissionen verursachen können. Auch die Nutzungsdauer beeinflusst die Umweltbilanz eines Produkts. Daraus folgt, dass nachhaltiger Konsum nicht nur beim Kauf, sondern auch bei Nutzung und Entsorgung bedacht werden muss.'}
+      ]
+    },
+    {
+      id:'eroertern',
+      title:'Erörtern',
+      image:'assets/eroertern.webp',
+      definition:'Argumente zu einer Frage abwägen und zu einem begründeten Urteil kommen.',
+      question:'Welche Position überzeugt unter welchen Bedingungen?',
+      levels:[
+        {type:'choice', title:'Stufe 1: Urteil erkennen', prompt:'Welche Antwort passt zu „Erörtere, ob Social Media im Unterricht genutzt werden sollte“?', answer:'Social Media kann sinnvoll sein, wenn klare Regeln gelten; zugleich müssen Datenschutz und Ablenkung berücksichtigt werden.', options:['Social Media ist gut.','Social Media kann sinnvoll sein, wenn klare Regeln gelten; zugleich müssen Datenschutz und Ablenkung berücksichtigt werden.','Viele Jugendliche nutzen Social Media.'], why:'Eine Erörterung wägt mehrere Argumente ab und endet mit einem Urteil.'},
+        {type:'multi', title:'Stufe 2: Abwägung vorbereiten', prompt:'Welche Schritte gehören zu einer Erörterung?', answers:['Pro-Argumente prüfen','Contra-Argumente prüfen','begründetes Urteil formulieren'], options:['Pro-Argumente prüfen','Contra-Argumente prüfen','nur die eigene Meinung nennen','begründetes Urteil formulieren'], why:'Erörtern bedeutet abwägen, nicht nur behaupten.'},
+        {type:'write', title:'Stufe 3: Sätze schreiben', prompt:'Erörtere kurz, ob Smartphones im Unterricht erlaubt sein sollten. Schreibe vier bis sechs Sätze.', min:180, criteria:['Pro und Contra berücksichtigen','Argumente gewichten','begründetes Urteil formulieren'], model:'Smartphones können im Unterricht nützlich sein, weil sie schnelle Recherche und digitale Zusammenarbeit ermöglichen. Gleichzeitig besteht die Gefahr, dass Nachrichten oder Apps vom Lernen ablenken. Besonders wichtig ist deshalb, ob es klare Regeln und konkrete Arbeitsaufträge gibt. Unter diesen Bedingungen können Smartphones sinnvoll eingesetzt werden. Ohne klare Regeln überwiegen jedoch die Nachteile.'}
+      ]
+    }
+  ];
+  const afb2Tasks = {
+    beschreiben:[
+      {type:'choice', title:'AFB II 1: Material gezielt auswerten', prompt:'Du sollst eine Grafik zur Internetnutzung beschreiben. Welche Auswahl ist am besten?', answer:'Ich nenne Thema, Zeitraum, auffällige Entwicklungen und zentrale Werte in sinnvoller Reihenfolge.', options:['Ich nenne Thema, Zeitraum, auffällige Entwicklungen und zentrale Werte in sinnvoller Reihenfolge.','Ich bewerte, ob die Entwicklung gut oder schlecht ist.','Ich erkläre zuerst mögliche Ursachen der Entwicklung.'], why:'AFB II verlangt hier, Material geordnet auszuwerten und relevante Beobachtungen auszuwählen.'},
+      {type:'multi', title:'AFB II 2: Beobachtungen ordnen', prompt:'Welche Angaben helfen, eine Diagrammbeschreibung fachlich zu strukturieren?', answers:['Ausgangswert und Endwert','starke Veränderungen','sachliche Reihenfolge'], options:['Ausgangswert und Endwert','starke Veränderungen','eigene Meinung','sachliche Reihenfolge'], why:'Eine AFB-II-Beschreibung ordnet Materialdaten und wählt das Wesentliche aus.'},
+      {type:'write', title:'AFB II 3: Beschreibung ausformulieren', prompt:'Beschreibe eine Tabelle, in der die tägliche Bildschirmzeit von Jugendlichen von 2018 bis 2026 von 2 auf 4 Stunden steigt.', min:150, criteria:['Materialdaten nutzen','Entwicklung ordnen','sachlich formulieren'], model:'Die Tabelle zeigt die tägliche Bildschirmzeit von Jugendlichen zwischen 2018 und 2026. Der Wert steigt insgesamt von 2 auf 4 Stunden. Damit verdoppelt sich die Nutzungszeit im dargestellten Zeitraum. Besonders wichtig ist der Endwert, weil er die deutliche Zunahme sichtbar macht.'}
+    ],
+    erklaeren:[
+      {type:'choice', title:'AFB II 1: Ursache und Wirkung verknüpfen', prompt:'Welche Antwort erklärt, warum Städte im Sommer oft wärmer sind als das Umland?', answer:'Viele versiegelte Flächen speichern Wärme; dadurch kühlen Städte nachts langsamer ab.', options:['Städte haben viele Gebäude.','Viele versiegelte Flächen speichern Wärme; dadurch kühlen Städte nachts langsamer ab.','Ich finde Hitze in Städten unangenehm.'], why:'Die Antwort nutzt Ursache und Wirkung und stellt den Zusammenhang her.'},
+      {type:'multi', title:'AFB II 2: Erklärungsschritte auswählen', prompt:'Welche Schritte gehören zu einer AFB-II-Erklärung?', answers:['Ursache benennen','Wirkung ableiten','Zusammenhang mit Fachbegriff sichern'], options:['Ursache benennen','Wirkung ableiten','nur Beispiele sammeln','Zusammenhang mit Fachbegriff sichern'], why:'AFB II verlangt Verknüpfung, nicht bloß Wiedergabe.'},
+      {type:'write', title:'AFB II 3: Zusammenhang ausformulieren', prompt:'Erkläre, warum regelmäßiges Lesen den Wortschatz erweitern kann.', min:150, criteria:['Ursache benennen','Wirkung erläutern','Zusammenhang deutlich machen'], model:'Regelmäßiges Lesen erweitert den Wortschatz, weil man immer wieder auf neue Wörter und Formulierungen trifft. Aus dem Zusammenhang kann man ihre Bedeutung erschließen. Wenn diese Wörter häufiger begegnen, bleiben sie leichter im Gedächtnis. Dadurch kann man sie später auch selbst verwenden.'}
+    ],
+    begruenden:[
+      {type:'choice', title:'AFB II 1: Argument stützen', prompt:'Welche Begründung ist am stärksten?', answer:'Projektarbeit ist sinnvoll, weil Lernende Verantwortung übernehmen und ihre Ergebnisse gemeinsam reflektieren.', options:['Projektarbeit ist sinnvoll, weil sie sinnvoll ist.','Projektarbeit ist sinnvoll, weil Lernende Verantwortung übernehmen und ihre Ergebnisse gemeinsam reflektieren.','Projektarbeit gibt es an vielen Schulen.'], why:'Die Antwort enthält einen tragfähigen Grund und zeigt die Wirkung.'},
+      {type:'multi', title:'AFB II 2: Argumentqualität prüfen', prompt:'Welche Merkmale machen eine Begründung überzeugend?', answers:['klare Aussage','nachvollziehbarer Grund','passendes Beispiel'], options:['klare Aussage','nachvollziehbarer Grund','bloße Behauptung','passendes Beispiel'], why:'AFB II fordert, Gründe nicht nur zu nennen, sondern nachvollziehbar zu stützen.'},
+      {type:'write', title:'AFB II 3: Begründung ausformulieren', prompt:'Begründe, warum Gruppenarbeit beim Lernen hilfreich sein kann.', min:150, criteria:['These formulieren','Grund ausführen','Beispiel oder Folge nennen'], model:'Gruppenarbeit kann beim Lernen hilfreich sein, weil Schülerinnen und Schüler verschiedene Ideen einbringen. Wenn sie ihre Gedanken erklären müssen, prüfen sie zugleich ihr eigenes Verständnis. Außerdem können Unklarheiten gemeinsam geklärt werden. Dadurch wird Lernen aktiver und oft nachhaltiger.'}
+    ],
+    erlaeutern:[
+      {type:'choice', title:'AFB II 1: Beispiel nutzen', prompt:'Welche Antwort erläutert die Aussage „Sprache beeinflusst Wirkung“?', answer:'Ein emotionales Wort wie „Katastrophe“ wirkt stärker als „Problem“, weil es beim Leser mehr Dringlichkeit erzeugt.', options:['Sprache besteht aus Wörtern.','Ein emotionales Wort wie „Katastrophe“ wirkt stärker als „Problem“, weil es beim Leser mehr Dringlichkeit erzeugt.','Ich mag starke Wörter.'], why:'Die Antwort erklärt und verdeutlicht den Zusammenhang an einem Beispiel.'},
+      {type:'multi', title:'AFB II 2: Materialbezug sichern', prompt:'Was gehört zu einer guten Erläuterung am Material?', answers:['Aussage erklären','konkrete Materialstelle nutzen','Wirkung verdeutlichen'], options:['Aussage erklären','konkrete Materialstelle nutzen','Material nur abschreiben','Wirkung verdeutlichen'], why:'Erläutern heißt: erklären und anschaulich machen.'},
+      {type:'write', title:'AFB II 3: Erläuterung ausformulieren', prompt:'Erläutere, wie eine Überschrift die Erwartung an einen Text lenken kann. Nutze ein Beispiel.', min:160, criteria:['Sachverhalt erklären','Beispiel einbauen','Wirkung verdeutlichen'], model:'Eine Überschrift lenkt die Erwartung, weil sie vor dem Lesen einen Schwerpunkt setzt. Wenn ein Artikel zum Beispiel „Gefahr im Netz“ heißt, erwartet man eher Risiken und Warnungen. Dadurch liest man die Informationen mit einer bestimmten Haltung. Die Überschrift beeinflusst also, worauf Leser besonders achten.'}
+    ],
+    darlegen:[
+      {type:'choice', title:'AFB II 1: Gedankengang ordnen', prompt:'Welche Struktur passt zu „Lege die Folgen von Bewegungsmangel dar“?', answer:'Zuerst gesundheitliche Folgen, dann soziale Folgen und abschließend eine zusammenfassende Schlussfolgerung.', options:['Eine ungeordnete Liste mit Beispielen.','Zuerst gesundheitliche Folgen, dann soziale Folgen und abschließend eine zusammenfassende Schlussfolgerung.','Nur ein persönliches Erlebnis.'], why:'Darlegen verlangt einen logisch geordneten Gedankengang.'},
+      {type:'multi', title:'AFB II 2: Darstellung strukturieren', prompt:'Welche Bausteine unterstützen eine Darlegung?', answers:['Oberpunkte bilden','Zusammenhänge erklären','Schlussfolgerung ziehen'], options:['Oberpunkte bilden','Zusammenhänge erklären','Gedanken zufällig notieren','Schlussfolgerung ziehen'], why:'AFB II verlangt eine geordnete und fachlich zusammenhängende Darstellung.'},
+      {type:'write', title:'AFB II 3: Darlegung ausformulieren', prompt:'Lege dar, welche Faktoren den Lernerfolg beeinflussen können.', min:170, criteria:['sinnvoll gliedern','Faktoren erklären','Zusammenhang herstellen'], model:'Der Lernerfolg hängt von mehreren Faktoren ab. Zunächst ist regelmäßiges Üben wichtig, weil Inhalte dadurch gefestigt werden. Außerdem beeinflussen Motivation und Konzentration, wie aufmerksam man arbeitet. Auch Rückmeldungen helfen, Fehler zu erkennen und gezielt zu verbessern. Insgesamt entsteht Lernerfolg durch das Zusammenspiel dieser Faktoren.'}
+    ],
+    eroertern:[
+      {type:'choice', title:'AFB II 1: Argumente abwägen', prompt:'Welche Antwort zeigt eine echte Abwägung?', answer:'Digitale Schulbücher sparen Gewicht und Papier, können aber bei schlechter Ausstattung zu technischen Problemen führen.', options:['Digitale Schulbücher sind modern.','Digitale Schulbücher sparen Gewicht und Papier, können aber bei schlechter Ausstattung zu technischen Problemen führen.','Viele Schulen nutzen Bücher.'], why:'Die Antwort berücksichtigt zwei Seiten und bereitet ein Urteil vor.'},
+      {type:'multi', title:'AFB II 2: Erörterung vorbereiten', prompt:'Welche Schritte gehören zur AFB-II-Vorbereitung einer Erörterung?', answers:['Argumente sammeln','Argumente gewichten','Bedingungen für ein Urteil prüfen'], options:['Argumente sammeln','Argumente gewichten','nur eine Seite betrachten','Bedingungen für ein Urteil prüfen'], why:'Erörtern heißt, Argumente zu prüfen und zu gewichten.'},
+      {type:'write', title:'AFB II 3: Abwägung ausformulieren', prompt:'Erörtere kurz, ob Klassenarbeiten durch Projekte ersetzt werden sollten.', min:190, criteria:['Pro und Contra nennen','Argumente gewichten','Urteil begründen'], model:'Projekte können Klassenarbeiten teilweise ersetzen, weil sie selbstständiges Arbeiten und Anwendung von Wissen zeigen. Außerdem ermöglichen sie kreative Lösungen und Teamarbeit. Gegen einen vollständigen Ersatz spricht, dass Einzelleistungen manchmal schwerer vergleichbar sind. Daher sollten Projekte Klassenarbeiten ergänzen, aber nicht vollständig ersetzen.'}
+    ]
+  };
+  operators.forEach(op => { op.levels = op.levels.concat(afb2Tasks[op.id] || []); });
+  const testItems = [
+    {q:'Welcher Operator verlangt eine sachliche Wiedergabe sichtbarer Merkmale?', a:'beschreiben', c:['beschreiben','begründen','erörtern'], why:'Beschreiben bleibt beim Beobachtbaren.'},
+    {q:'Welcher Operator fragt vor allem nach Ursachen, Wirkungen und Zusammenhängen?', a:'erklären', c:['erklären','nennen','beschreiben'], why:'Erklären macht Zusammenhänge verständlich.'},
+    {q:'„Stütze deine Aussage mit Gründen.“ Welcher Operator passt?', a:'begründen', c:['darlegen','begründen','erläutern'], why:'Begründen verbindet Aussage und Grund.'},
+    {q:'Welcher Operator verlangt zusätzlich Beispiel oder Materialbezug?', a:'erläutern', c:['erläutern','beschreiben','ankreuzen'], why:'Erläutern verdeutlicht eine Erklärung an Material oder Beispiel.'},
+    {q:'Welcher Operator verlangt einen klar geordneten Gedankengang?', a:'darlegen', c:['darlegen','nennen','auswählen'], why:'Darlegen führt einen Sachverhalt strukturiert aus.'},
+    {q:'Welcher Operator verlangt Pro/Contra und ein Urteil?', a:'erörtern', c:['beschreiben','erörtern','erklären'], why:'Erörtern prüft Argumente und kommt zu einem Urteil.'},
+    {q:'„Die Werte steigen von 40 auf 70 Prozent.“ Was ist das?', a:'Beschreibung', c:['Beschreibung','Begründung','Urteil'], why:'Es wird eine erkennbare Entwicklung wiedergegeben.'},
+    {q:'„Die Werte steigen, weil mehr Geräte verfügbar sind.“ Was ist das?', a:'Erklärung', c:['Erklärung','Aufzählung','Beschreibung'], why:'Hier wird eine Ursache genannt.'},
+    {q:'Welche Formulierung ist am ehesten AFB II?', a:'Werte auswählen, ordnen und zusammenhängend darstellen.', c:['Nur den Begriff nennen.','Werte auswählen, ordnen und zusammenhängend darstellen.','Eine freie Meinung ohne Beleg formulieren.'], why:'AFB II verlangt Anwendung und Strukturierung.'},
+    {q:'Was passt zu einer Erläuterung?', a:'Die Aussage erklären und am Beispiel der Anzeige zeigen.', c:['Nur die Anzeige beschreiben.','Die Aussage erklären und am Beispiel der Anzeige zeigen.','Nur sagen, ob die Anzeige schön ist.'], why:'Erläutern verbindet Erklärung und Beispiel.'},
+    {q:'Welche Begründung ist am stärksten?', a:'Leseförderung ist sinnvoll, weil regelmäßiges Lesen Wortschatz und Textverständnis stärkt.', c:['Leseförderung ist sinnvoll.','Leseförderung ist sinnvoll, weil regelmäßiges Lesen Wortschatz und Textverständnis stärkt.','Leseförderung kommt in Schulen vor.'], why:'Die Begründung enthält einen nachvollziehbaren Grund.'},
+    {q:'Welche Antwortstrategie passt zu „Lege die Ursachen dar“?', a:'Ursachen ordnen, fachlich erklären und logisch verbinden.', c:['Ursachen ordnen, fachlich erklären und logisch verbinden.','Nur eine Ursache nennen.','Nur Folgen bewerten.'], why:'Darlegen verlangt eine geordnete Ausführung.'},
+    {q:'Was fehlt bei einer Erörterung, wenn nur Vorteile genannt werden?', a:'die Abwägung mit Gegenargumenten', c:['die Abwägung mit Gegenargumenten','die Überschrift','die Beschreibung eines Diagramms'], why:'Eine Erörterung braucht verschiedene Perspektiven.'},
+    {q:'Welche Antwort überschreitet den Operator „beschreiben“?', a:'Die Kurve steigt, weil Familien heute mehr Medien besitzen.', c:['Die Kurve steigt zwischen 2018 und 2026.','Der höchste Wert liegt 2026.','Die Kurve steigt, weil Familien heute mehr Medien besitzen.'], why:'Die Ursache gehört eher zum Erklären.'},
+    {q:'Welche Schlussformulierung zeigt ein gutes erörterndes Urteil?', a:'Insgesamt ist der Einsatz sinnvoll, wenn klare Regeln Ablenkung begrenzen.', c:['Ich bin dafür.','Insgesamt ist der Einsatz sinnvoll, wenn klare Regeln Ablenkung begrenzen.','Es gibt viele Meinungen.'], why:'Das Urteil ist begründet und nennt eine Bedingung.'}
+  ];
+
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch (_) { saved = {}; }
+  let state = { view: saved.view || 'train', op: saved.op || operators[0].id, level: Number.isInteger(saved.level) ? saved.level : 0, done: saved.done || {}, test: saved.test || { index:0, score:0, answered:false, complete:false } };
+
+  function store(){ try { localStorage.setItem(key, JSON.stringify(state)); } catch (_) {} }
+  function current(){ return operators.find(op => op.id === state.op) || operators[0]; }
+  function completedTotal(){ return operators.reduce((sum, op) => sum + Object.keys(state.done[op.id] || {}).length, 0); }
+  function isDone(opId, level){ return !!(state.done[opId] && state.done[opId][level]); }
+  function markDone(opId, level){ state.done[opId] = state.done[opId] || {}; state.done[opId][level] = true; store(); renderNav(); renderScore(); }
+  function renderScore(){ score.innerHTML = `<strong>${completedTotal()}/36</strong><span>Aufgaben</span>`; }
+  function renderNav(){
+    nav.innerHTML = operators.map(op => {
+      const count = Object.keys(state.done[op.id] || {}).length;
+      return `<button type="button" class="btn ${op.id===state.op && state.view==='train'?'btn-primary':''}" data-op="${op.id}" aria-pressed="${op.id===state.op && state.view==='train'}"><span>${op.title}</span><span class="operator-count810">${count}/6</span></button>`;
+    }).join('');
+    nav.querySelectorAll('[data-op]').forEach(btn => btn.addEventListener('click', () => { state.view='train'; state.op = btn.dataset.op; state.level = 0; store(); render(); }));
+  }
+  function render(){
+    renderScore();
+    renderNav();
+    if(state.view === 'test') { renderTest(); return; }
+    const op = current();
+    const task = op.levels[state.level];
+    work.innerHTML = `
+      <div class="operator-head810">
+        <div class="operator-title810">
+          <span class="viz-badge">Operator</span>
+          <h2>${op.title}</h2>
+          <p>${op.definition}</p>
+          <p><b>Leitfrage:</b> ${op.question}</p>
+        </div>
+        <div class="operator-image810"><img src="${op.image}" alt="Bildkarte zum Operator ${op.title}" loading="lazy"></div>
+      </div>
+      <div class="task-tabs810" aria-label="Aufgabenstufen">
+        ${op.levels.map((level, index) => `<button type="button" class="btn ${index===state.level?'btn-primary':''}" data-level="${index}" aria-pressed="${index===state.level}">${isDone(op.id,index)?'✓ ':''}Aufgabe ${index+1}<br><span class="text-small">${levelLabel(index)}</span></button>`).join('')}
+      </div>
+      <section class="task-panel810" id="taskPanel810"></section>
+    `;
+    work.querySelectorAll('[data-level]').forEach(btn => btn.addEventListener('click', () => { state.level = Number(btn.dataset.level); store(); render(); }));
+    renderTask(task, op);
+  }
+  function levelLabel(index){ return index===0?'Erkennen':index===1?'Anwenden':index===2?'Sätze schreiben':`AFB II ${index-2}`; }
+  function renderTask(task, op){
+    if(task.type === 'choice') return renderChoice(task, op);
+    if(task.type === 'multi') return renderMulti(task, op);
+    return renderWrite(task, op);
+  }
+  function panel(){ return work.querySelector('#taskPanel810'); }
+  function renderChoice(task, op){
+    panel().innerHTML = `<h3>${task.title}</h3><div class="prompt810">${task.prompt}</div><div class="answer-grid810">${task.options.map(option => `<button type="button" class="btn" data-answer="${option.replace(/"/g,'&quot;')}">${option}</button>`).join('')}</div><div class="feedback810" id="feedback810">${isDone(op.id,state.level)?'Diese Aufgabe ist bereits abgeschlossen.':'Wähle die beste Antwort.'}</div>${nextControls(op)}`;
+    panel().querySelectorAll('[data-answer]').forEach(btn => btn.addEventListener('click', () => {
+      const fb = panel().querySelector('#feedback810');
+      if(btn.dataset.answer === task.answer){ btn.classList.add('btn-primary'); fb.className='feedback810 good'; fb.innerHTML = `<b>Richtig.</b><br>${task.why}`; markDone(op.id,state.level); }
+      else { fb.className='feedback810 try'; fb.textContent='Noch nicht präzise genug. Prüfe, welche Sprachhandlung der Operator verlangt.'; }
+    }));
+    bindNext();
+  }
+  function renderMulti(task, op){
+    panel().innerHTML = `<h3>${task.title}</h3><div class="prompt810">${task.prompt}</div><div class="choice-list810">${task.options.map((option, index) => `<label class="form-check"><input class="form-check-input" type="checkbox" value="${option.replace(/"/g,'&quot;')}" id="check810-${index}"><span class="form-check-label">${option}</span></label>`).join('')}</div><div class="feedback810" id="feedback810">${isDone(op.id,state.level)?'Diese Aufgabe ist bereits abgeschlossen.':'Wähle alle passenden Bausteine aus.'}</div><div class="actions810"><button type="button" class="btn btn-primary" id="checkMulti810">Auswahl prüfen</button>${nextButton()}</div>`;
+    panel().querySelector('#checkMulti810').addEventListener('click', () => {
+      const selected = Array.from(panel().querySelectorAll('input:checked')).map(input => input.value).sort();
+      const expected = [...task.answers].sort();
+      const fb = panel().querySelector('#feedback810');
+      if(JSON.stringify(selected) === JSON.stringify(expected)){ fb.className='feedback810 good'; fb.innerHTML=`<b>Richtig.</b><br>${task.why}`; markDone(op.id,state.level); }
+      else { fb.className='feedback810 try'; fb.textContent='Fast. Prüfe, ob du nur die Bausteine gewählt hast, die wirklich zum Operator gehören.'; }
+    });
+    bindNext();
+  }
+  function renderWrite(task, op){
+    panel().innerHTML = `<h3>${task.title}</h3><div class="prompt810">${task.prompt}</div><div class="criteria810">${task.criteria.map(item => `<span>${item}</span>`).join('')}</div><div class="writer810"><label class="form-label" for="writer810">Deine Antwort</label><textarea class="form-control" id="writer810" placeholder="Schreibe hier deine Sätze."></textarea><div class="feedback810" id="feedback810">Schreibe mindestens ${task.min} Zeichen. Danach kannst du deine Lösung prüfen.</div></div><div class="actions810"><button type="button" class="btn btn-primary" id="checkText810">Text prüfen</button><button type="button" class="btn" id="model810">Musterlösung anzeigen</button>${nextButton()}</div><div id="modelBox810"></div>`;
+    panel().querySelector('#checkText810').addEventListener('click', () => {
+      const text = panel().querySelector('#writer810').value.trim();
+      const fb = panel().querySelector('#feedback810');
+      if(text.length >= task.min){ fb.className='feedback810 good'; fb.innerHTML='<b>Gut.</b><br>Dein Text ist ausführlich genug. Vergleiche nun mit den Kriterien und der Musterlösung.'; markDone(op.id,state.level); }
+      else { fb.className='feedback810 try'; fb.textContent=`Dein Text ist noch zu kurz. Ergänze fachliche Details und klare Verknüpfungen. Aktuell: ${text.length}/${task.min} Zeichen.`; }
+    });
+    panel().querySelector('#model810').addEventListener('click', () => {
+      panel().querySelector('#modelBox810').innerHTML = `<div class="model810"><b>Musterlösung:</b><p>${task.model}</p></div>`;
+    });
+    bindNext();
+  }
+  function nextControls(op){ return `<div class="actions810"><span>${Object.keys(state.done[op.id] || {}).length}/6 Aufgaben zu ${op.title} abgeschlossen</span>${nextButton()}</div>`; }
+  function nextButton(){ return state.level < current().levels.length - 1 ? '<button type="button" class="btn" id="nextTask810">Nächste Aufgabe</button>' : '<button type="button" class="btn" id="nextOperator810">Nächster Operator</button>'; }
+  function bindNext(){
+    const nextTask = panel().querySelector('#nextTask810');
+    if(nextTask) nextTask.addEventListener('click', () => { state.level = Math.min(current().levels.length - 1, state.level + 1); store(); render(); });
+    const nextOp = panel().querySelector('#nextOperator810');
+    if(nextOp) nextOp.addEventListener('click', () => {
+      const index = operators.findIndex(op => op.id === state.op);
+      state.op = operators[(index + 1) % operators.length].id;
+      state.level = 0;
+      store();
+      render();
+    });
+  }
+  function renderTest(){
+    const test = state.test;
+    if(test.complete || test.index >= testItems.length) { renderTestResult(); return; }
+    const item = testItems[test.index];
+    const rounded = Math.round((test.score / Math.max(1, test.index)) * 10) * 10;
+    work.innerHTML = `<div class="test-head810"><div><span class="viz-badge">Teste dein Wissen</span><h2>Aufgabe ${test.index + 1} von ${testItems.length}</h2><p>Die Aufgaben werden Schritt für Schritt anspruchsvoller.</p></div><button type="button" class="btn" id="backToTraining810">Zurück zum Training</button></div><div class="test-meter810" aria-label="Testfortschritt"><span style="width:${(test.index / testItems.length) * 100}%"></span></div><div class="prompt810"><b>${item.q}</b></div><div class="answer-grid810">${item.c.map(option => `<button type="button" class="btn" data-test-answer="${option.replace(/"/g,'&quot;')}" ${test.answered?'disabled':''}>${option}</button>`).join('')}</div><div class="feedback810" id="testFeedback810">${test.index===0?'Wähle eine Antwort.':`Zwischenstand: ${test.score}/${test.index} richtig, etwa ${Number.isFinite(rounded)?rounded:0}% im 10%-Schritt.`}</div><div class="actions810"><span>Gut ab 80%: mindestens 12 von 15 Aufgaben.</span><button type="button" class="btn btn-primary" id="nextTest810" ${test.answered?'':'hidden'}>${test.index===testItems.length-1?'Auswertung anzeigen':'Nächste Testaufgabe'}</button></div>`;
+    work.querySelector('#backToTraining810').addEventListener('click',()=>{state.view='train';store();render();});
+    work.querySelectorAll('[data-test-answer]').forEach(btn => btn.addEventListener('click', () => answerTest(btn, item)));
+    work.querySelector('#nextTest810').addEventListener('click', nextTest);
+  }
+  function answerTest(button, item){
+    if(state.test.answered) return;
+    const correct = button.dataset.testAnswer === item.a;
+    if(correct) state.test.score += 1;
+    state.test.answered = true;
+    const answered = state.test.index + 1;
+    const percent10 = Math.round((state.test.score / answered) * 10) * 10;
+    const fb = work.querySelector('#testFeedback810');
+    fb.className = correct ? 'feedback810 good' : 'feedback810 try';
+    fb.innerHTML = `<b>${correct?'Richtig.':'Nicht ganz.'}</b><br>${item.why}<br>Zwischenstand: ${state.test.score}/${answered} richtig, ${percent10}% im 10%-Schritt.`;
+    button.classList.add(correct ? 'btn-primary' : 'btn-ghost');
+    work.querySelectorAll('[data-test-answer]').forEach(btn => btn.disabled = true);
+    work.querySelector('#nextTest810').hidden = false;
+    store();
+  }
+  function nextTest(){
+    state.test.index += 1;
+    state.test.answered = false;
+    if(state.test.index >= testItems.length) state.test.complete = true;
+    store();
+    renderTest();
+  }
+  function renderTestResult(){
+    const percent = Math.round((state.test.score / testItems.length) * 100);
+    const percent10 = Math.round(percent / 10) * 10;
+    const good = percent >= 80;
+    work.innerHTML = `<div class="test-head810"><div><span class="viz-badge">Auswertung</span><h2>Teste dein Wissen</h2><p>${state.test.score} von ${testItems.length} Aufgaben richtig.</p></div><button type="button" class="btn" id="backToTraining810">Zurück zum Training</button></div><div class="result810 ${good?'good':'practice'}"><h3>${percent10}% im 10%-Feedbackschritt</h3><p>${good?'Gute Leistung: Du hast mindestens 80% erreicht.':'Noch Übungsbedarf: Für eine gute Leistung brauchst du mindestens 80%, also 12 von 15 Aufgaben.'}</p><p>Exakter Wert: ${percent}%.</p></div><div class="actions810"><span>${good?'Weiter so: Die Operatoren sitzen schon recht sicher.':'Empfehlung: Wiederhole besonders die Operatoren, bei denen du zwischen Beschreibung, Erklärung und Bewertung unterscheiden musst.'}</span><button type="button" class="btn btn-primary" id="resetTest810">Test neu starten</button></div>`;
+    work.querySelector('#backToTraining810').addEventListener('click',()=>{state.view='train';store();render();});
+    work.querySelector('#resetTest810').addEventListener('click',()=>{state.test={index:0,score:0,answered:false,complete:false};store();renderTest();});
+  }
+  testButton.addEventListener('click',()=>{state.view='test'; if(state.test.complete) state.test={index:0,score:0,answered:false,complete:false}; store(); render();});
+  function setCurrentNav810(id){ root.querySelectorAll('[data-nav810]').forEach(item=>{const active=item.dataset.nav810===id;item.classList.toggle('btn-primary',active);if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');}); }
+  function goOverview810(){ state.view='train';state.op=operators[0].id;state.level=0;store();render();setCurrentNav810('start810');root.scrollIntoView({behavior:'smooth',block:'start'}); }
+  root.querySelector('#overview810').addEventListener('click',goOverview810);
+  root.querySelector('#navOverview810').addEventListener('click',goOverview810);
+  root.querySelectorAll('[data-nav810]').forEach(item=>item.addEventListener('click',()=>setCurrentNav810(item.dataset.nav810)));
+  if('IntersectionObserver' in window){
+    const navObserver810=new IntersectionObserver(entries=>{entries.filter(entry=>entry.isIntersecting).forEach(entry=>setCurrentNav810(entry.target.id));},{rootMargin:'-18% 0px -67% 0px',threshold:0.01});
+    ['start810','info810','bilder810','training810','test810'].forEach(id=>{const section=root.querySelector(`#${id}`);if(section)navObserver810.observe(section);});
+  }
+  render();
+})();
+</script>
+
+</body>
+</html>
+
