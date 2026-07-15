@@ -843,7 +843,7 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
   #operatoren810 .nav-note810 span { color:var(--muted-foreground); }
   #operatoren810 .topbar810 { display:flex; justify-content:space-between; align-items:center; gap:.8rem; margin-bottom:1rem; padding:.55rem .7rem; background:color-mix(in srgb,var(--brand) 5%,var(--background)); border-bottom:1px solid color-mix(in srgb,var(--brand) 20%,var(--border)); }
   #operatoren810 .topbar-left810, #operatoren810 .topbar-right810 { display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; }
-  #operatoren810 .topbar-left810 strong { color:var(--brand); }
+  #operatoren810 .topbar-left810 strong { color:var(--brand); font-size:1.15rem; line-height:1.2; }
   #operatoren810 .subject-label810, #operatoren810 .overview-label810 { display:inline-flex; align-items:center; min-height:2rem; padding:.3rem .65rem; background:var(--card); color:var(--card-foreground); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 2px 8px color-mix(in srgb,var(--foreground) 8%,transparent); }
   #operatoren810 .subject-label810 { color:var(--brand-dark); font-weight:500; }
   #operatoren810 .topic-mark810 { display:grid; place-items:center; width:2rem; height:2rem; border-radius:50%; background:var(--brand); color:#fff; font-weight:500; }
@@ -894,6 +894,14 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
   #operatoren810 .task-panel810 { padding:1rem; border:1px solid var(--border); border-radius:var(--radius); background:color-mix(in srgb,var(--card) 45%,transparent); }
   #operatoren810 .task-panel810 h3 { margin:.25rem 0 .65rem; }
   #operatoren810 .prompt810 { padding:.9rem; background:var(--soft2); border-left:4px solid var(--viz-series-2); border-radius:var(--radius); margin:.75rem 0; }
+  #operatoren810 .task-context810 { margin:.9rem 0; }
+  #operatoren810 .population-chart810 { display:block; width:100%; height:auto; max-height:25rem; color:var(--foreground); background:color-mix(in srgb,var(--card) 72%,var(--background)); border:1px solid var(--border); border-radius:var(--radius); }
+  #operatoren810 .population-chart810 .grid { stroke:var(--border); stroke-width:1; }
+  #operatoren810 .population-chart810 .axis { stroke:currentColor; stroke-width:2; }
+  #operatoren810 .population-chart810 .trend { fill:none; stroke:var(--viz-series-1); stroke-width:5; stroke-linecap:round; stroke-linejoin:round; }
+  #operatoren810 .population-chart810 .point { fill:var(--viz-series-1); stroke:var(--background); stroke-width:3; }
+  #operatoren810 .population-chart810 text { fill:currentColor; font:inherit; }
+  #operatoren810 .task-context810 figcaption { margin-top:.4rem; text-align:center; }
   #operatoren810 .answer-grid810 { display:grid; gap:.55rem; margin:.75rem 0; }
   #operatoren810 .answer-grid810 .btn { justify-content:flex-start; text-align:left; white-space:normal; }
   #operatoren810 .choice-list810 { display:grid; gap:.55rem; margin:.75rem 0; }
@@ -936,7 +944,7 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
       definition:'Merkmale eines Sachverhalts genau, sachlich und geordnet wiedergeben.',
       question:'Was ist erkennbar?',
       levels:[
-        {type:'choice', title:'Stufe 1: Operator erkennen', prompt:'Welche Antwort passt am besten zu „Beschreibe die Bevölkerungsentwicklung im Diagramm“?', answer:'Die Bevölkerung steigt zunächst langsam und ab 2000 deutlich stärker an.', options:['Die Bevölkerung steigt zunächst langsam und ab 2000 deutlich stärker an.','Die Bevölkerung steigt, weil die medizinische Versorgung besser wurde.','Ich finde die Entwicklung problematisch.'], why:'Die passende Antwort beschreibt erkennbare Merkmale, ohne Ursachen oder Bewertungen einzubauen.'},
+        {type:'choice', visual:'population', title:'Stufe 1: Operator erkennen', prompt:'Welche Antwort passt am besten zu „Beschreibe die Bevölkerungsentwicklung im Diagramm“?', answer:'Die Bevölkerung steigt zunächst langsam und ab 2000 deutlich stärker an.', options:['Die Bevölkerung steigt zunächst langsam und ab 2000 deutlich stärker an.','Die Bevölkerung steigt, weil die medizinische Versorgung besser wurde.','Ich finde die Entwicklung problematisch.'], why:'Die passende Antwort beschreibt erkennbare Merkmale, ohne Ursachen oder Bewertungen einzubauen.'},
         {type:'multi', title:'Stufe 2: Beobachtungen auswählen', prompt:'Welche Bausteine gehören in eine sachliche Beschreibung?', answers:['Zeitraum und Thema nennen','Auffällige Werte oder Wendepunkte benennen','Entwicklung geordnet wiedergeben'], options:['Zeitraum und Thema nennen','Auffällige Werte oder Wendepunkte benennen','Eine persönliche Meinung formulieren','Entwicklung geordnet wiedergeben'], why:'Eine Beschreibung bleibt beim Beobachtbaren und ordnet die Informationen sinnvoll.'},
         {type:'write', title:'Stufe 3: Sätze schreiben', prompt:'Formuliere drei bis vier Sätze zu einem Diagramm über steigende Mediennutzung von 2015 bis 2025.', min:120, criteria:['sachlich bleiben','Zeitraum nennen','Entwicklung geordnet darstellen'], model:'Das Diagramm zeigt die Mediennutzung von Jugendlichen zwischen 2015 und 2025. Insgesamt nimmt die Nutzung deutlich zu. Besonders stark steigt sie nach 2020. Auffällig ist, dass der höchste Wert am Ende des dargestellten Zeitraums liegt.'}
       ]
@@ -1101,8 +1109,45 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
     return renderWrite(task, op);
   }
   function panel(){ return work.querySelector('#taskPanel810'); }
+  function populationDiagram810(){
+    return `<figure class="task-context810">
+      <svg class="population-chart810" viewBox="0 0 720 340" role="img" aria-labelledby="populationTitle810 populationDesc810">
+        <title id="populationTitle810">Bevölkerungsentwicklung von 1950 bis 2025</title>
+        <desc id="populationDesc810">Die Bevölkerung steigt bis zum Jahr 2000 langsam von etwa 50 auf 67 Millionen. Danach steigt sie deutlich stärker auf etwa 92 Millionen im Jahr 2025.</desc>
+        <text x="360" y="28" text-anchor="middle" font-weight="500">Bevölkerungsentwicklung (in Mio.)</text>
+        <line class="grid" x1="74" y1="264" x2="680" y2="264"></line>
+        <line class="grid" x1="74" y1="217" x2="680" y2="217"></line>
+        <line class="grid" x1="74" y1="170" x2="680" y2="170"></line>
+        <line class="grid" x1="74" y1="123" x2="680" y2="123"></line>
+        <line class="grid" x1="74" y1="76" x2="680" y2="76"></line>
+        <line class="axis" x1="74" y1="42" x2="74" y2="282"></line>
+        <line class="axis" x1="74" y1="282" x2="690" y2="282"></line>
+        <text x="58" y="269" text-anchor="end">50</text>
+        <text x="58" y="222" text-anchor="end">60</text>
+        <text x="58" y="175" text-anchor="end">70</text>
+        <text x="58" y="128" text-anchor="end">80</text>
+        <text x="58" y="81" text-anchor="end">90</text>
+        <text x="105" y="308" text-anchor="middle">1950</text>
+        <text x="260" y="308" text-anchor="middle">1975</text>
+        <text x="415" y="308" text-anchor="middle">2000</text>
+        <text x="530" y="308" text-anchor="middle">2010</text>
+        <text x="645" y="308" text-anchor="middle">2025</text>
+        <polyline class="trend" points="105,264 260,226 415,184 480,142 530,113 585,86 645,62"></polyline>
+        <circle class="point" cx="105" cy="264" r="7"></circle>
+        <circle class="point" cx="260" cy="226" r="7"></circle>
+        <circle class="point" cx="415" cy="184" r="7"></circle>
+        <circle class="point" cx="480" cy="142" r="7"></circle>
+        <circle class="point" cx="530" cy="113" r="7"></circle>
+        <circle class="point" cx="585" cy="86" r="7"></circle>
+        <circle class="point" cx="645" cy="62" r="7"></circle>
+        <text x="694" y="308" text-anchor="end">Jahr</text>
+      </svg>
+      <figcaption class="text-small text-muted">Beispieldiagramm zur Aufgabe</figcaption>
+    </figure>`;
+  }
   function renderChoice(task, op){
-    panel().innerHTML = `<h3>${task.title}</h3><div class="prompt810">${task.prompt}</div><div class="answer-grid810">${task.options.map(option => `<button type="button" class="btn" data-answer="${option.replace(/"/g,'&quot;')}">${option}</button>`).join('')}</div><div class="feedback810" id="feedback810">${isDone(op.id,state.level)?'Diese Aufgabe ist bereits abgeschlossen.':'Wähle die beste Antwort.'}</div>${nextControls(op)}`;
+    const context = task.visual === 'population' ? populationDiagram810() : '';
+    panel().innerHTML = `<h3>${task.title}</h3><div class="prompt810">${task.prompt}</div>${context}<div class="answer-grid810">${task.options.map(option => `<button type="button" class="btn" data-answer="${option.replace(/"/g,'&quot;')}">${option}</button>`).join('')}</div><div class="feedback810" id="feedback810">${isDone(op.id,state.level)?'Diese Aufgabe ist bereits abgeschlossen.':'Wähle die beste Antwort.'}</div>${nextControls(op)}`;
     panel().querySelectorAll('[data-answer]').forEach(btn => btn.addEventListener('click', () => {
       const fb = panel().querySelector('#feedback810');
       if(btn.dataset.answer === task.answer){ btn.classList.add('btn-primary'); fb.className='feedback810 good'; fb.innerHTML = `<b>Richtig.</b><br>${task.why}`; markDone(op.id,state.level); }
