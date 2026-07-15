@@ -740,7 +740,9 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
 <div id="operatorenStart" class="operatoren-start">
   <header class="start-topbar">
     <strong>Überblick Operatoren</strong>
-    <img class="asw-logo" src="assets/asw-logo.png" alt="Logo der Alemannenschule Wutöschingen">
+    <a class="asw-logo-link" href="https://asw-wutoeschingen.de" target="_blank" rel="noopener noreferrer" aria-label="Website der Alemannenschule Wutöschingen öffnen">
+      <img class="asw-logo" src="assets/asw-logo.png" alt="Logo der Alemannenschule Wutöschingen">
+    </a>
   </header>
 
   <main>
@@ -793,6 +795,8 @@ html,body{max-width:1180px;margin:0 auto;padding:1rem;background:var(--backgroun
   #operatorenStart { --brand:#9d1f2f; --brand-dark:#741622; color:var(--foreground); }
   #operatorenStart .start-topbar { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:.7rem .85rem; margin-bottom:1.4rem; border-bottom:2px solid color-mix(in srgb,var(--brand) 38%,var(--border)); background:color-mix(in srgb,var(--brand) 6%,var(--background)); }
   #operatorenStart .start-topbar strong { color:var(--brand); }
+  #operatorenStart .asw-logo-link { display:inline-flex; align-items:center; border-radius:12px; }
+  #operatorenStart .asw-logo-link:focus-visible { outline:3px solid var(--ring); outline-offset:4px; }
   #operatorenStart .asw-logo { display:block; width:4.6rem; height:4.6rem; object-fit:contain; flex:0 0 auto; }
   #operatorenStart .start-hero { display:flex; align-items:center; gap:1rem; max-width:52rem; margin:0 auto 1.6rem; }
   #operatorenStart .start-hero h1 { margin:.35rem 0; }
